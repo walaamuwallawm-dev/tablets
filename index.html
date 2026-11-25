@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>حجز التابلت</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lalezar&family=IBM+Plex+Sans+Arabic:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE: friendly school staff-room tool, calm and quick.
+   IDEA: the paper booking sheet pinned on the chalkboard by the tablet cart.
+   PICTURE: the day's 8-period sheet itself, two lanes (1–3 / 4–5).
+   COLOUR and TYPE: chalkboard green, paper white, coral pin; Lalezar titles + IBM Plex Sans Arabic.
+   LAYOUT: board header with week + day tabs, the sheet below, modal for booking. */
+:root{color-scheme:light dark;
+--bg:light-dark(#eef3ee,#0f1d17);--board:light-dark(#1f4d3a,#163a2c);--paper:light-dark(#fff,#18281f);
+--ink:light-dark(#15241c,#e8f0ea);--mute:light-dark(#5d7066,#9db3a6);--line:light-dark(#dbe5dd,#2a3f33);
+--coral:#ff6b4a;--a:light-dark(#2f7d5b,#5cc596);--b:light-dark(#3a64b0,#7aa2ea);--free:light-dark(#f5f9f5,#1d3127)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 "IBM Plex Sans Arabic",system-ui,sans-serif;overflow-x:clip}
+button,input,select{font:inherit}
+header{background:var(--board);color:#fff;padding:22px max(4vw,14px) 0}
+.top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;max-width:1000px;margin:auto}
+h1{font:400 clamp(30px,6vw,44px)/1.05 Lalezar,sans-serif;margin:0;flex:1}
+.gear{background:#ffffff1f;color:#fff;border:0;border-radius:12px;height:44px;padding:0 14px;cursor:pointer}
+.week{display:flex;align-items:center;gap:8px;max-width:1000px;margin:14px auto 0}
+.week b{flex:1;text-align:center;font-size:17px}
+.nav{width:44px;height:44px;border-radius:50%;border:0;background:#ffffff22;color:#fff;font-size:22px;cursor:pointer}
+.nav:disabled{opacity:.3;cursor:default}
+.note{max-width:1000px;margin:6px auto 0;text-align:center;font-size:13px;color:#cfe3d7}
+.note.hot{color:#fff;font-weight:700}.note.hot::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--coral);margin-inline-end:6px}
+.pin{display:inline-block;font-size:11px;font-weight:700;background:#fff3;border-radius:6px;padding:0 6px;margin-inline-start:6px;vertical-align:middle}
+.chk{display:flex;align-items:center;gap:10px;margin-top:14px;font-size:15px;font-weight:500}
+.chk input{width:22px;height:22px;accent-color:var(--coral)}
+.days{display:flex;gap:6px;max-width:1000px;margin:16px auto 0;overflow-x:auto}
+.day{flex:1 0 74px;border:0;border-radius:14px 14px 0 0;background:#ffffff18;color:#fff;padding:10px 4px;cursor:pointer;line-height:1.2}
+.day small{display:block;opacity:.8;font-size:13px}
+.day.done{opacity:.55;order:9}.day.done small::after{content:" • انتهى"}
+.day.on{opacity:1;background:var(--bg);color:var(--ink);font-weight:700}
+.day.today small::after{content:" • اليوم";color:var(--coral)}
+main{max-width:1000px;margin:auto;padding:18px max(4vw,14px) 40px}
+.sheet{background:var(--paper);border-radius:18px;box-shadow:0 1px 0 var(--line),0 10px 30px #0001;overflow:hidden}
+.row{display:grid;grid-template-columns:64px minmax(0,1fr) minmax(0,1fr);border-top:1px solid var(--line)}
+.row.head{border:0;font-size:14px;font-weight:700}
+.row.head div{padding:12px 10px}
+.row.head small{display:block;font-weight:500;font-size:13px;color:var(--mute)}
+.row.head .la{color:var(--a)}.row.head .lb{color:var(--b)}
+.pn{display:grid;place-items:center;font:400 26px Lalezar,sans-serif;color:var(--mute);background:var(--free)}
+.cell{padding:8px;border-inline-start:1px solid var(--line)}
+.tm{font-size:13px;color:var(--mute);white-space:nowrap;direction:ltr;text-align:right}
+.slot{width:100%;min-height:52px;border-radius:12px;border:2px dashed var(--line);background:transparent;color:var(--mute);cursor:pointer;text-align:start;padding:6px 10px}
+.slot:hover,.slot:focus-visible{border-color:var(--coral);color:var(--ink);outline:none}
+.slot.bk{border:0;color:#fff;cursor:pointer}
+.slot.bk{background:#6b7c72}
+.g1{background:#2f6fd6!important}.g2{background:#2e9c5a!important}.g3{background:#7a4fd0!important}
+.g4{background:#e0559a!important}.g5{background:#f2c230!important;color:#3a2c00!important}.fx{background:#f07a1a!important}
+.legend{display:flex;flex-wrap:wrap;gap:8px 14px;justify-content:center;font-size:13px;margin:0 0 12px}
+.legend span{display:inline-flex;align-items:center;gap:6px}.legend i{width:14px;height:14px;border-radius:4px;display:inline-block}
+.slot.bk b{display:block;font-size:15px}.slot.bk span{font-size:13px;opacity:.9}
+.slot.past{opacity:.55}
+.cell{display:flex;flex-direction:column;gap:6px}
+.slot.bk{min-height:0;padding:6px 10px}
+.slot.bk em{font-style:normal;font-size:12px;font-weight:700;background:#fff3;border-radius:6px;padding:0 6px;float:inline-end}
+.slot.full{border-style:solid;cursor:default;font-size:13px;min-height:36px;text-align:center}
+.status{text-align:center;color:var(--mute);font-size:14px;margin:10px 0}
+.err{color:var(--coral)}
+.dlg{position:fixed;inset:0;background:#0007;display:none;place-items:center;padding:16px;z-index:9}
+.dlg.on{display:grid}
+.box{background:var(--paper);color:var(--ink);border-radius:20px;padding:22px;width:min(420px,100%);max-height:90vh;overflow:auto}
+.box h2{font:400 26px/1.1 Lalezar,sans-serif;margin:0 0 4px}
+.box p{margin:0 0 14px;color:var(--mute);font-size:14px}
+label{display:block;font-size:14px;font-weight:500;margin:10px 0 4px}
+input,select{width:100%;height:46px;border-radius:12px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);padding:0 12px;font-size:16px}
+input:focus,select:focus{outline:2px solid var(--coral);border-color:transparent}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.acts{display:flex;gap:10px;margin-top:18px}
+.acts button{flex:1;height:46px;border-radius:12px;border:0;cursor:pointer;font-weight:700}
+.go{background:var(--coral);color:#fff}.no{background:var(--free);color:var(--ink)}
+.del{background:#c0392b;color:#fff}.ed{background:var(--board);color:#fff}
+.req{display:block;margin:18px auto 0;background:none;border:0;color:var(--mute);text-decoration:underline;cursor:pointer;min-height:44px}
+.mrow{display:flex;align-items:center;gap:8px;padding:10px 0;border-top:1px solid var(--line)}.mrow span{flex:1}
+.mrow button{height:38px;border-radius:10px;border:0;padding:0 12px;cursor:pointer;font-weight:700}
+.mh{font-weight:700;margin:14px 0 4px;font-size:14px}
+.tgrid{display:grid;grid-template-columns:40px 1fr 1fr;gap:6px;align-items:center}
+.tgrid input{height:40px;font-size:15px;direction:ltr;text-align:center}
+.tgrid .h{font-size:13px;font-weight:700}
+.msg{min-height:20px;font-size:14px;color:var(--coral);margin-top:8px}
+@media(max-width:600px){.row{grid-template-columns:44px minmax(0,1fr) minmax(0,1fr)}.pn{font-size:22px}.cell{padding:6px}.slot{padding:6px 8px}}
+@media(prefers-reduced-motion:no-preference){.box{animation:up .18s ease-out}@keyframes up{from{transform:translateY(12px);opacity:0}}}
+</style>
+</head>
+<body>
+<header>
+  <div class="top"><h1>حجز التابلت</h1><button class="gear" id="out" hidden>خروج</button><button class="gear" id="gear" hidden>أوقات الحصص</button></div>
+  <div class="week"><button class="nav" id="prev" aria-label="الأسبوع السابق">›</button><b id="wk"></b><button class="nav" id="next" aria-label="الأسبوع التالي">‹</button></div>
+  <div class="note" id="note"></div>
+  <div class="days" id="days"></div>
+</header>
+<main>
+  <div class="legend"><span><i class="g1"></i>الأول</span><span><i class="g2"></i>الثاني</span><span><i class="g3"></i>الثالث</span><span><i class="g4"></i>الرابع</span><span><i class="g5"></i>الخامس</span><span><i class="fx"></i>حجز ثابت</span></div>
+  <div class="sheet" id="sheet"></div>
+  <div class="status" id="st">جاري تحميل الحجوزات…</div>
+</main>
+
+<div class="dlg" id="dlgBook"><form class="box" id="fBook">
+  <h2 id="bT">حجز</h2><p id="bS"></p>
+  <label for="tName">اسم المعلمة</label><input id="tName" required autocomplete="name">
+  <div class="two">
+    <div><label for="grade">الصف</label><select id="grade" required></select></div>
+    <div><label for="sec">الشعبة</label><input id="sec" placeholder="مثلًا: أ"></div>
+  </div>
+  <label for="cnt">عدد التابلت</label><input id="cnt" type="number" inputmode="numeric" min="1" required>
+  <label class="chk" id="fixRow" hidden><input type="checkbox" id="fix"> حجز ثابت كل أسبوع بنفس اليوم والحصة</label>
+  <div class="msg" id="bMsg"></div>
+  <div class="acts"><button class="go" type="submit">احجزي</button><button class="no" type="button" data-close>إلغاء</button></div>
+</form></div>
+
+<div class="dlg" id="dlgView"><div class="box">
+  <h2 id="vT"></h2><p id="vS"></p>
+  <div class="msg" id="vMsg"></div>
+  <div class="acts"><button class="ed" id="vEdit" type="button">تعديل</button><button class="del" id="vDel" type="button">إلغاء الحجز</button><button class="no" type="button" data-close>رجوع</button></div>
+</div></div>
+
+<div class="dlg" id="dlgLogin"><form class="box" id="fLogin">
+  <h2>أهلًا فيكِ</h2><p id="lP">اكتبي إيميل المدرسة تبعك، وبيوصلك كود دخول على الإيميل.</p>
+  <div id="stepE"><label for="email">إيميل المدرسة</label><input id="email" type="email" inputmode="email" autocomplete="email" dir="ltr" required></div>
+  <div id="stepC" hidden><label for="otp">الكود (٦ أرقام)</label><input id="otp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" dir="ltr"></div>
+  <div class="msg" id="lMsg"></div>
+  <div class="acts"><button class="go" type="submit" id="lGo">ابعتيلي الكود</button><button class="no" type="button" id="lBack" hidden>تغيير الإيميل</button></div>
+</form></div>
+
+<div class="dlg" id="dlgTimes"><form class="box" id="fTimes">
+  <h2>أوقات الحصص</h2><p>اكتبي بداية ونهاية كل حصة، مثل 7:45 - 8:25</p>
+  <div class="tgrid" id="tgrid"></div>
+  <div class="msg" id="tMsg"></div>
+  <div class="acts"><button class="go" type="submit">حفظ</button><button class="no" type="button" data-close>إلغاء</button></div>
+</form></div>
+
+<script>
+{
+// ← الصقي هون رابط الـ Web app من Google Apps Script
+const API_URL="https://script.google.com/macros/s/AKfycbwPEcfCTu6pDPnIRRPeMAdnjL5YwRFgM70u3431chJMc2pgRsC9aUU9lf6SKaVCuVh4fw/exec";
+
+const DAYS=["الأحد","الإثنين","الثلاثاء","الأربعاء","الخميس"];
+const LANES={a:{name:"الأول – الثالث",n:15,grades:["الأول","الثاني","الثالث"]},b:{name:"الرابع – الخامس",n:22,grades:["الرابع","الخامس"]}};
+// أوقات الحصص الافتراضية (المشرفات بيقدروا يغيروها من زر «أوقات الحصص»)
+const DEF_TIMES={
+  a:["8:00 - 8:40","8:40 - 9:20","9:35 - 10:15","11:05 - 11:45","11:45 - 12:25","12:25 - 1:00","1:20 - 1:55","1:55 - 2:30"],
+  b:["8:00 - 8:40","9:10 - 9:50","10:00 - 10:40","10:40 - 11:20","11:40 - 12:20","12:20 - 1:00","1:10 - 1:50","1:50 - 2:30"]};
+const GC={"الأول":"g1","الثاني":"g2","الثالث":"g3","الرابع":"g4","الخامس":"g5"};
+const P=8,SWITCH_HOUR=14;
+const maxAhead=()=>{const n=new Date();return n.getDay()===4&&n.getHours()<SWITCH_HOUR?1:0};
+const $=id=>document.getElementById(id);
+const pad=n=>String(n).padStart(2,"0");
+const key=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const store={get:k=>{try{return localStorage.getItem(k)||""}catch(_){return ""}},set:(k,v)=>{try{v?localStorage.setItem(k,v):localStorage.removeItem(k)}catch(_){}}};
+
+function baseSunday(){
+  const now=new Date(),d=new Date(now.getFullYear(),now.getMonth(),now.getDate()),w=d.getDay();
+  let sun=addDays(d,-w);
+  if(w===5||w===6||(w===4&&now.getHours()>=SWITCH_HOUR))sun=addDays(sun,7);
+  return sun;
+}
+let base=baseSunday(),off=0,dayIdx=0,bookings={},fixed={},times=DEF_TIMES;
+let token=store.get("tb_token"),myName=store.get("tb_me"),role=null,pending=null,loadSeq=0;
+const isAdmin=()=>role==="admin";
+
+const weekStart=()=>addDays(base,off*7);
+const fmt=d=>`${d.getDate()}/${d.getMonth()+1}`;
+function pickDefaultDay(){const t=key(new Date());dayIdx=0;for(let i=0;i<5;i++)if(key(addDays(weekStart(),i))===t)dayIdx=i}
+const cntOf=(x,g)=>Math.max(1,Math.min(LANES[g].n,+x.count||LANES[g].n));
+function slotList(date,g,p){return [...(fixed[`${dayIdx}_${g}_${p}`]||[]),...(bookings[`${date}_${g}_${p}`]||[])]}
+const used=(list,g)=>list.reduce((a,x)=>a+cntOf(x,g),0);
+
+// ===== الاتصال بـ Google Sheets =====
+async function apiGet(params){
+  const u=API_URL+"?"+new URLSearchParams({...params,token}).toString();
+  const r=await fetch(u);return r.json();
+}
+async function apiPost(body){
+  const r=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({...body,token})});
+  return r.json();
+}
+
+function renderHead(){
+  const s=weekStart(),ma=maxAhead();if(off>ma)off=ma;
+  $("wk").textContent=`أسبوع ${fmt(s)} – ${fmt(addDays(s,4))}`;
+  $("prev").disabled=off<=0;$("next").disabled=off>=ma;
+  $("note").textContent=ma&&off===0?"جدول الأسبوع الجاي صار متاح، اضغطي السهم ‹":(ma?"الأسبوع الحالي بيختفي اليوم الساعة ٢:٠٠":"جدول الأسبوع الجاي بيظهر يوم الخميس");
+  $("note").classList.toggle("hot",!!ma&&off===0);
+  const t=key(new Date());
+  // الأيام اللي خلصت بتنقلب لآخر القائمة
+  $("days").innerHTML=DAYS.map((n,i)=>{const d=addDays(s,i),k=key(d);
+    return `<button class="day${i===dayIdx?" on":""}${k===t?" today":""}${k<t?" done":""}" data-i="${i}">${n}<small>${fmt(d)}</small></button>`}).join("");
+}
+function renderSheet(){
+  const date=key(addDays(weekStart(),dayIdx)),past=date<key(new Date());
+  let h=`<div class="row head"><div></div><div class="la">${LANES.a.name}<small>${LANES.a.n} تابلت</small></div><div class="lb">${LANES.b.name}<small>${LANES.b.n} تابلت</small></div></div>`;
+  for(let p=1;p<=P;p++){
+    h+=`<div class="row"><div class="pn">${p}</div>`+["a","b"].map(g=>{
+      const list=slotList(date,g,p),left=LANES[g].n-used(list,g),tm=(times[g]||[])[p-1];
+      let c=`<div class="cell ${g}">`+(tm?`<div class="tm">${esc(tm)}</div>`:"");
+      c+=list.map(x=>`<button class="slot bk ${x.fixed?"fx":(GC[x.grade]||"")}${past?" past":""}" data-g="${g}" data-p="${p}" data-k="${x.fixed?"f":"b"}" data-id="${esc(x.id)}"><em>${cntOf(x,g)}</em><b>${esc(x.teacher)}${x.fixed?'<i class="pin">ثابت</i>':""}</b><span>${esc(x.cls)}</span></button>`).join("");
+      if(past)c+=list.length?"":`<button class="slot past" disabled>—</button>`;
+      else if(left>0)c+=`<button class="slot" data-g="${g}" data-p="${p}" data-new="1" ${role?"":"disabled"}>+ متاح ${left===LANES[g].n?"":`(باقي ${left})`}</button>`;
+      else c+=`<div class="slot full">محجوزة بالكامل</div>`;
+      return c+`</div>`;
+    }).join("")+`</div>`;
+  }
+  $("sheet").innerHTML=h;
+}
+function render(){renderHead();renderSheet()}
+
+function open(id){$(id).classList.add("on")}
+function close(){document.querySelectorAll(".dlg.on:not(#dlgLogin)").forEach(d=>d.classList.remove("on"));pending=null}
+document.querySelectorAll("[data-close]").forEach(b=>b.onclick=close);
+document.querySelectorAll(".dlg:not(#dlgLogin)").forEach(d=>d.onclick=e=>{if(e.target===d)close()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")close()});
+function slotLabel(g,p){const d=addDays(weekStart(),dayIdx);return `${DAYS[dayIdx]} ${fmt(d)} • الحصة ${p} • ${LANES[g].name}`}
+function setStatus(t,err){$("st").textContent=t;$("st").className="status"+(err?" err":"")}
+const clsOf=x=>`الصف ${x.grade}${x.sec?" / "+x.sec:""}`;
+
+async function load(quiet){
+  if(!role)return;
+  const seq=++loadSeq;if(!quiet)setStatus("جاري تحميل الحجوزات…");
+  try{
+    const r=await apiGet({week:key(weekStart())});
+    if(seq!==loadSeq)return;
+    if(!r.ok){if(r.error==="auth")logout();return}
+    const m={},f={};
+    r.bookings.forEach(x=>{x.cls=clsOf(x);const k=`${x.date}_${x.lane}_${x.period}`;(m[k]=m[k]||[]).push(x)});
+    r.fixed.forEach(x=>{x.cls=clsOf(x);x.fixed=true;const k=`${x.day}_${x.lane}_${x.period}`;(f[k]=f[k]||[]).push(x)});
+    Object.values(m).forEach(l=>l.sort((a,b)=>(+a.at||0)-(+b.at||0)));
+    bookings=m;fixed=f;times={a:(r.times&&r.times.a&&r.times.a.some(Boolean))?r.times.a:DEF_TIMES.a,b:(r.times&&r.times.b&&r.times.b.some(Boolean))?r.times.b:DEF_TIMES.b};role=r.role;if(r.name){myName=r.name;store.set("tb_me",myName)}
+    $("gear").hidden=!isAdmin();renderSheet();
+    setStatus(`أهلًا ${myName||""} • `+(isAdmin()?"إنتِ مشرفة، اضغطي على أي حجز لتعديله":"اضغطي على «متاح» للحجز"));
+  }catch(_){if(seq===loadSeq)setStatus("ما قدرنا نوصل للحجوزات، تأكدي من الإنترنت.",1)}
+}
+
+$("days").onclick=e=>{const b=e.target.closest(".day");if(!b)return;dayIdx=+b.dataset.i;render()};
+$("prev").onclick=()=>{if(off>0){off--;pickDefaultDay();bookings={};render();load()}};
+$("next").onclick=()=>{if(off<maxAhead()){off++;dayIdx=0;bookings={};render();load()}};
+
+function openBook(g,p,left,x){
+  $("grade").innerHTML=LANES[g].grades.map(y=>`<option${x&&y===x.grade?" selected":""}>${y}</option>`).join("");
+  $("tName").value=x?x.teacher:(myName||"");$("tName").readOnly=!isAdmin();$("sec").value=x?x.sec||"":"";
+  $("cnt").max=left;$("cnt").value=x?cntOf(x,g):left;$("bMsg").textContent="";
+  $("fixRow").hidden=!isAdmin()||!!x;$("fix").checked=false;
+  open("dlgBook");if(!x)setTimeout(()=>($("tName").value?$("sec"):$("tName")).focus(),50);
+}
+$("sheet").onclick=e=>{
+  const b=e.target.closest("button.slot");if(!b||b.disabled)return;
+  const g=b.dataset.g,p=+b.dataset.p,date=key(addDays(weekStart(),dayIdx));
+  if(b.dataset.new){
+    const left=LANES[g].n-used(slotList(date,g,p),g);
+    pending={g,p,date};
+    $("bT").textContent="حجز التابلت";$("bS").textContent=`${slotLabel(g,p)} • متاح ${left} من ${LANES[g].n}`;
+    openBook(g,p,left);return;
+  }
+  const isFixed=b.dataset.k==="f",list=isFixed?fixed[`${dayIdx}_${g}_${p}`]:bookings[`${date}_${g}_${p}`],x=(list||[]).find(y=>y.id===b.dataset.id);if(!x)return;
+  pending={g,p,date,x,isFixed};
+  $("vT").textContent=x.teacher;
+  $("vS").textContent=`${x.cls} • ${cntOf(x,g)} تابلت — ${slotLabel(g,p)}${isFixed?" — حجز ثابت كل أسبوع":""}`;$("vMsg").textContent="";
+  const can=isAdmin()&&(isFixed||date>=key(new Date()));
+  $("vDel").textContent=isFixed?"إلغاء الحجز الثابت":"إلغاء الحجز";$("vDel").dataset.sure="";
+  $("vDel").hidden=!can;$("vEdit").hidden=!can;
+  open("dlgView");
+};
+$("vEdit").onclick=()=>{
+  const q=pending;if(!q||!isAdmin())return;const {x,g,p,date}=q;
+  const left=LANES[g].n-used(slotList(date,g,p),g)+cntOf(x,g);
+  document.querySelectorAll(".dlg.on").forEach(d=>d.classList.remove("on"));
+  pending={...q,edit:true};
+  $("bT").textContent="تعديل الحجز";$("bS").textContent=`${slotLabel(g,p)} • متاح لهالحجز ${left}`;
+  openBook(g,p,left,x);
+};
+
+const ERR={full:r=>r.left>0?`الباقي ${r.left} تابلت بس.`:"للأسف الحصة انحجزت بالكامل هلأ.",busy:()=>"في حدا عم يحجز هلأ، جربي بعد ثواني.",perm:()=>"هاد بس للمشرفات.",past:()=>"ما بنقدر نحجز بيوم خلص.",gone:()=>"هالحجز انمسح من قبل.",auth:()=>"انتهت صلاحية الدخول، ادخلي من جديد."};
+const errMsg=r=>(ERR[r&&r.error]||(()=>"صار خطأ، جربي كمان مرة."))(r||{});
+
+$("fBook").onsubmit=async e=>{
+  e.preventDefault();const q=pending;if(!q)return;
+  const teacher=$("tName").value.trim(),sec=$("sec").value.trim(),count=Math.floor(+$("cnt").value),grade=$("grade").value;
+  if(!teacher){$("bMsg").textContent="اكتبي الاسم";return}
+  if(!(count>=1)){$("bMsg").textContent="اكتبي عدد التابلت";return}
+  const btn=$("fBook").querySelector(".go");btn.disabled=true;$("bMsg").textContent="جاري الحفظ…";
+  try{
+    const body={lane:q.g,period:q.p,teacher,grade,sec,count};
+    const r=q.edit?await apiPost({action:"edit",id:q.x.id,fixed:q.isFixed,...body})
+      :($("fix").checked&&isAdmin())?await apiPost({action:"addFixed",day:dayIdx,...body})
+      :await apiPost({action:"book",date:q.date,day:dayIdx,week:key(weekStart()),...body});
+    if(r.ok){close();load(true)}else{$("bMsg").textContent=errMsg(r);if(r.error==="auth")logout()}
+  }catch(_){$("bMsg").textContent="ما قدرنا نوصل، تأكدي من الإنترنت."}
+  finally{btn.disabled=false}
+};
+$("vDel").onclick=async()=>{
+  const q=pending;if(!q)return;
+  if($("vDel").dataset.sure!=="1"){$("vDel").dataset.sure="1";$("vDel").textContent="متأكدة؟ اضغطي مرة ثانية";return}
+  try{const r=await apiPost({action:"del",id:q.x.id,fixed:q.isFixed});if(r.ok){close();load(true)}else $("vMsg").textContent=errMsg(r)}
+  catch(_){$("vMsg").textContent="ما زبط الإلغاء، جربي كمان مرة."}
+};
+$("gear").onclick=()=>{
+  let h=`<div></div><div class="h">${LANES.a.name}</div><div class="h">${LANES.b.name}</div>`;
+  for(let i=0;i<P;i++)h+=`<div class="h">${i+1}</div><input id="ta${i}" value="${esc((times.a||[])[i])}" placeholder="7:45 - 8:25"><input id="tb${i}" value="${esc((times.b||[])[i])}" placeholder="7:45 - 8:25">`;
+  $("tgrid").innerHTML=h;$("tMsg").textContent="";open("dlgTimes");
+};
+$("fTimes").onsubmit=async e=>{
+  e.preventDefault();
+  const a=[],b=[];for(let i=0;i<P;i++){a.push($("ta"+i).value.trim());b.push($("tb"+i).value.trim())}
+  try{const r=await apiPost({action:"times",times:{a,b}});if(r.ok){close();load(true)}else $("tMsg").textContent=errMsg(r)}
+  catch(_){$("tMsg").textContent="ما زبط الحفظ."}
+};
+
+// ===== الدخول بإيميل المدرسة =====
+let step="e";
+function showStep(e){step=e;$("stepE").hidden=e!=="e";$("stepC").hidden=e!=="c";$("lBack").hidden=e!=="c";$("email").required=e==="e";
+  $("lGo").textContent=e==="e"?"ابعتيلي الكود":"دخول";
+  $("lP").textContent=e==="e"?"اكتبي إيميل المدرسة تبعك، وبيوصلك كود دخول على الإيميل.":`بعتنا كود على ${$("email").value.trim()} — إذا ما لقيتيه شوفي Junk.`;
+  if(e==="c")setTimeout(()=>$("otp").focus(),50)}
+function logout(){token="";role=null;store.set("tb_token","");$("out").hidden=true;$("gear").hidden=true;bookings={};fixed={};renderSheet();setStatus("");$("otp").value="";$("lMsg").textContent="";showStep("e");open("dlgLogin")}
+$("out").onclick=logout;
+$("lBack").onclick=()=>{$("lMsg").textContent="";showStep("e")};
+$("fLogin").onsubmit=async e=>{
+  e.preventDefault();const email=$("email").value.trim().toLowerCase();if(!email)return;
+  $("lGo").disabled=true;$("lMsg").textContent=step==="e"?"جاري الإرسال…":"جاري التحقق…";
+  try{
+    if(step==="e"){
+      const r=await apiGet({action:"sendCode",email});
+      if(r.ok){store.set("tb_email",email);$("lMsg").textContent=r.again?"الكود انبعت قبل شوي، استعملي نفس الكود.":"";showStep("c")}
+      else $("lMsg").textContent=r.error==="notlisted"?"هالإيميل مش بقائمة المعلمات. احكي مع صاحبة الصفحة.":"صار خطأ، جربي كمان مرة.";
+    }else{
+      const r=await apiGet({action:"verify",email,otp:$("otp").value.trim()});
+      if(r.ok){token=r.token;role=r.role;myName=r.name;store.set("tb_token",token);store.set("tb_me",myName);
+        $("dlgLogin").classList.remove("on");$("out").hidden=false;load()}
+      else $("lMsg").textContent=r.error==="tries"?"جربتي كتير، اطلبي كود جديد بعد ١٠ دقايق.":"الكود غلط، تأكدي منه.";
+    }
+  }catch(_){$("lMsg").textContent="ما قدرنا نوصل. تأكدي من الإنترنت."}
+  finally{$("lGo").disabled=false}
+};
+$("email").value=store.get("tb_email");
+
+setInterval(()=>{
+  const nb=baseSunday();
+  if(key(nb)!==key(base)){base=nb;off=0;pickDefaultDay();bookings={};render();load()}
+  else if(off>maxAhead()){off=0;pickDefaultDay();bookings={};render();load()}
+  else{renderHead();load(true)}
+},30000);
+
+pickDefaultDay();render();
+if(token){role="teacher";$("out").hidden=false;load()}else{setStatus("");showStep("e");open("dlgLogin")}
+}
+</script>
+</body>
+</html>
