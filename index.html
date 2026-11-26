@@ -41,11 +41,12 @@ h1{font:400 clamp(30px,6vw,44px)/1.05 Lalezar,sans-serif;margin:0;flex:1}
 .day.today small::after{content:" • اليوم";color:var(--coral)}
 main{max-width:1000px;margin:auto;padding:18px max(4vw,14px) 40px}
 .sheet{background:var(--paper);border-radius:18px;box-shadow:0 1px 0 var(--line),0 10px 30px #0001;overflow:hidden}
-.row{display:grid;grid-template-columns:64px minmax(0,1fr) minmax(0,1fr);border-top:1px solid var(--line)}
+.sheet{overflow-x:auto}
+.row{display:grid;grid-template-columns:48px repeat(4,minmax(96px,1fr));border-top:1px solid var(--line)}
 .row.head{border:0;font-size:14px;font-weight:700}
 .row.head div{padding:12px 10px}
 .row.head small{display:block;font-weight:500;font-size:13px;color:var(--mute)}
-.row.head .la{color:var(--a)}.row.head .lb{color:var(--b)}
+.row.head .lk1,.row.head .lk2{color:light-dark(#0f8f84,#4fd1c5)}.row.head .la{color:var(--a)}.row.head .lb{color:var(--b)}
 .pn{display:grid;place-items:center;font:400 26px Lalezar,sans-serif;color:var(--mute);background:var(--free)}
 .cell{padding:8px;border-inline-start:1px solid var(--line)}
 .tm{font-size:13px;color:var(--mute);white-space:nowrap;direction:ltr;text-align:right}
@@ -53,7 +54,7 @@ main{max-width:1000px;margin:auto;padding:18px max(4vw,14px) 40px}
 .slot:hover,.slot:focus-visible{border-color:var(--coral);color:var(--ink);outline:none}
 .slot.bk{border:0;color:#fff;cursor:pointer}
 .slot.bk{background:#6b7c72}
-.g1{background:#2f6fd6!important}.g2{background:#2e9c5a!important}.g3{background:#7a4fd0!important}
+.g0{background:#14b8a6!important}.g1{background:#2f6fd6!important}.g2{background:#2e9c5a!important}.g3{background:#7a4fd0!important}
 .g4{background:#e0559a!important}.g5{background:#f2c230!important;color:#3a2c00!important}.fx{background:#f07a1a!important}
 .legend{display:flex;flex-wrap:wrap;gap:8px 14px;justify-content:center;font-size:13px;margin:0 0 12px}
 .legend span{display:inline-flex;align-items:center;gap:6px}.legend i{width:14px;height:14px;border-radius:4px;display:inline-block}
@@ -62,6 +63,7 @@ main{max-width:1000px;margin:auto;padding:18px max(4vw,14px) 40px}
 .cell{display:flex;flex-direction:column;gap:6px}
 .slot.bk{min-height:0;padding:6px 10px}
 .slot.bk em{font-style:normal;font-size:12px;font-weight:700;background:#fff3;border-radius:6px;padding:0 6px;float:inline-end}
+.slot.none{border:0;min-height:36px;cursor:default;text-align:center;opacity:.4}
 .slot.full{border-style:solid;cursor:default;font-size:13px;min-height:36px;text-align:center}
 .status{text-align:center;color:var(--mute);font-size:14px;margin:10px 0}
 .err{color:var(--coral)}
@@ -86,7 +88,7 @@ input:focus,select:focus{outline:2px solid var(--coral);border-color:transparent
 .tgrid input{height:40px;font-size:15px;direction:ltr;text-align:center}
 .tgrid .h{font-size:13px;font-weight:700}
 .msg{min-height:20px;font-size:14px;color:var(--coral);margin-top:8px}
-@media(max-width:600px){.row{grid-template-columns:44px minmax(0,1fr) minmax(0,1fr)}.pn{font-size:22px}.cell{padding:6px}.slot{padding:6px 8px}}
+@media(max-width:600px){.row{grid-template-columns:32px repeat(4,minmax(84px,1fr))}.slot.bk b{font-size:13px}.slot.bk span{font-size:12px}.tm{font-size:11px}.pn{font-size:22px}.cell{padding:6px}.slot{padding:6px 8px}}
 @media(prefers-reduced-motion:no-preference){.box{animation:up .18s ease-out}@keyframes up{from{transform:translateY(12px);opacity:0}}}
 </style>
 </head>
@@ -98,7 +100,7 @@ input:focus,select:focus{outline:2px solid var(--coral);border-color:transparent
   <div class="days" id="days"></div>
 </header>
 <main>
-  <div class="legend"><span><i class="g1"></i>الأول</span><span><i class="g2"></i>الثاني</span><span><i class="g3"></i>الثالث</span><span><i class="g4"></i>الرابع</span><span><i class="g5"></i>الخامس</span><span><i class="fx"></i>حجز ثابت</span></div>
+  <div class="legend"><span><i class="g0"></i>الروضة</span><span><i class="g1"></i>الأول</span><span><i class="g2"></i>الثاني</span><span><i class="g3"></i>الثالث</span><span><i class="g4"></i>الرابع</span><span><i class="g5"></i>الخامس</span><span><i class="fx"></i>حجز ثابت</span></div>
   <div class="sheet" id="sheet"></div>
   <div class="status" id="st">جاري تحميل الحجوزات…</div>
 </main>
@@ -108,7 +110,7 @@ input:focus,select:focus{outline:2px solid var(--coral);border-color:transparent
   <label for="tName">اسم المعلمة</label><input id="tName" required autocomplete="name">
   <div class="two">
     <div><label for="grade">الصف</label><select id="grade" required></select></div>
-    <div><label for="sec">الشعبة</label><input id="sec" placeholder="مثلًا: أ"></div>
+    <div><label for="sec">الشعبة</label><select id="sec"></select></div>
   </div>
   <label for="cnt">عدد التابلت</label><input id="cnt" type="number" inputmode="numeric" min="1" required>
   <label class="chk" id="fixRow" hidden><input type="checkbox" id="fix"> حجز ثابت كل أسبوع بنفس اليوم والحصة</label>
@@ -144,14 +146,22 @@ input:focus,select:focus{outline:2px solid var(--coral);border-color:transparent
 const API_URL="https://script.google.com/macros/s/AKfycbwPEcfCTu6pDPnIRRPeMAdnjL5YwRFgM70u3431chJMc2pgRsC9aUU9lf6SKaVCuVh4fw/exec";
 
 const DAYS=["الأحد","الإثنين","الثلاثاء","الأربعاء","الخميس"];
-const LANES={a:{name:"الأول – الثالث",n:15,grades:["الأول","الثاني","الثالث"]},b:{name:"الرابع – الخامس",n:22,grades:["الرابع","الخامس"]}};
+// الروضة والأول–الثالث بيشتركوا بنفس الـ١٥ تابلت (pool)
+const LANES={k1:{name:"روضة أولى",n:15,pool:"a",max:6,grades:["روضة أولى"]},k2:{name:"روضة ثانية",n:15,pool:"a",max:6,grades:["روضة ثانية"]},a:{name:"الأول – الثالث",n:15,pool:"a",max:8,grades:["الأول","الثاني","الثالث"]},b:{name:"الرابع – الخامس",n:20,pool:"b",max:8,grades:["الرابع","الخامس"]}};
+const ORDER=["k1","k2","a","b"];
+const poolLanes=g=>ORDER.filter(x=>LANES[x].pool===LANES[g].pool);
+const AB=["أ","ب","ج","د","هـ","و"];
+const SECS={"روضة أولى":["العنبر","البنفسج","المنثور","الريحان"],"روضة ثانية":["القرنفل","السوسن","النرجس","الزنبق","الورد"]};
+const secsOf=gr=>SECS[gr]||AB;
 // أوقات الحصص الافتراضية (المشرفات بيقدروا يغيروها من زر «أوقات الحصص»)
 const DEF_TIMES={
   a:["8:00 - 8:40","8:40 - 9:20","9:35 - 10:15","11:05 - 11:45","11:45 - 12:25","12:25 - 1:00","1:20 - 1:55","1:55 - 2:30"],
+  k1:["9:10 - 9:40","9:40 - 10:10","10:45 - 11:15","11:15 - 11:45","11:45 - 12:15","12:15 - 12:45"],
+  k2:["9:20 - 9:50","9:50 - 10:20","10:50 - 11:20","11:20 - 11:50","11:50 - 12:20","12:20 - 12:50"],
   b:["8:00 - 8:40","9:10 - 9:50","10:00 - 10:40","10:40 - 11:20","11:40 - 12:20","12:20 - 1:00","1:10 - 1:50","1:50 - 2:30"]};
 // أوقات خاصة لأيام معيّنة (٢ = الثلاثاء، ٤ = الخميس) — بتنعبى لما توصل
 const DEF_DAY={};
-const GC={"الأول":"g1","الثاني":"g2","الثالث":"g3","الرابع":"g4","الخامس":"g5"};
+const GC={"روضة أولى":"g0","روضة ثانية":"g0","الأول":"g1","الثاني":"g2","الثالث":"g3","الرابع":"g4","الخامس":"g5"};
 const P=8,SWITCH_HOUR=14;
 const maxAhead=()=>{const n=new Date();return n.getDay()===4&&n.getHours()<SWITCH_HOUR?1:0};
 const $=id=>document.getElementById(id);
@@ -176,7 +186,20 @@ const fmt=d=>`${d.getDate()}/${d.getMonth()+1}`;
 function pickDefaultDay(){const t=key(new Date());dayIdx=0;for(let i=0;i<5;i++)if(key(addDays(weekStart(),i))===t)dayIdx=i}
 const cntOf=(x,g)=>Math.max(1,Math.min(LANES[g].n,+x.count||LANES[g].n));
 function slotList(date,g,p){return [...(fixed[`${dayIdx}_${g}_${p}`]||[]),...(bookings[`${date}_${g}_${p}`]||[])]}
+// تحويل "1:20 - 1:55" لدقائق (الساعات من ١ لـ ٦ بعد الظهر)
+function span(t){const m=String(t||"").match(/(\d+):(\d+)\s*-\s*(\d+):(\d+)/);if(!m)return null;const f=(h,mi)=>{h=+h;if(h<7)h+=12;return h*60+ +mi};return [f(m[1],m[2]),f(m[3],m[4])]}
+// التابلت المستعملة بنفس الوقت من كل الخانات المشتركة (الروضة + الأول–الثالث)
+function poolUsed(date,g,p){
+  const me=span(timesFor(dayIdx,g)[p-1]);let sum=0;
+  poolLanes(g).forEach(x=>{for(let q=1;q<=LANES[x].max;q++){
+    const o=span(timesFor(dayIdx,x)[q-1]);
+    const hit=(x===g&&q===p)||(me&&o&&me[0]<o[1]&&o[0]<me[1]);
+    if(hit)sum+=used(slotList(date,x,q),x);
+  }});
+  return sum;
+}
 function timesFor(d,g){
+  if(g==="k1"||g==="k2")return DEF_TIMES[g];
   const pick=o=>o&&o[g]&&o[g].some(Boolean)?o[g]:null;
   return pick(times[String(d)])||pick(DEF_DAY[d])||pick(times.all)||DEF_TIMES[g];
 }
@@ -205,10 +228,11 @@ function renderHead(){
 }
 function renderSheet(){
   const date=key(addDays(weekStart(),dayIdx)),past=date<key(new Date());
-  let h=`<div class="row head"><div></div><div class="la">${LANES.a.name}<small>${LANES.a.n} تابلت</small></div><div class="lb">${LANES.b.name}<small>${LANES.b.n} تابلت</small></div></div>`;
+  let h=`<div class="row head"><div></div><div class="lk1">${LANES.k1.name}<small>من نفس الـ15</small></div><div class="lk2">${LANES.k2.name}<small>من نفس الـ15</small></div><div class="la">${LANES.a.name}<small>${LANES.a.n} تابلت</small></div><div class="lb">${LANES.b.name}<small>${LANES.b.n} تابلت</small></div></div>`;
   for(let p=1;p<=P;p++){
-    h+=`<div class="row"><div class="pn">${p}</div>`+["a","b"].map(g=>{
-      const list=slotList(date,g,p),left=LANES[g].n-used(list,g),tm=timesFor(dayIdx,g)[p-1];
+    h+=`<div class="row"><div class="pn">${p}</div>`+ORDER.map(g=>{
+      if(p>LANES[g].max)return `<div class="cell ${g}"><div class="slot none">—</div></div>`;
+      const list=slotList(date,g,p),left=LANES[g].n-poolUsed(date,g,p),tm=timesFor(dayIdx,g)[p-1];
       let c=`<div class="cell ${g}">`+(tm?`<div class="tm">${esc(tm)}</div>`:"");
       c+=list.map(x=>`<button class="slot bk ${x.fixed?"fx":(GC[x.grade]||"")}${past?" past":""}" data-g="${g}" data-p="${p}" data-k="${x.fixed?"f":"b"}" data-id="${esc(x.id)}"><em>${cntOf(x,g)}</em><b>${esc(x.teacher)}${x.fixed?'<i class="pin">ثابت</i>':""}</b><span>${esc(x.cls)}</span></button>`).join("");
       if(past)c+=list.length?"":`<button class="slot past" disabled>—</button>`;
@@ -228,7 +252,7 @@ document.querySelectorAll(".dlg:not(#dlgLogin)").forEach(d=>d.onclick=e=>{if(e.t
 document.addEventListener("keydown",e=>{if(e.key==="Escape")close()});
 function slotLabel(g,p){const d=addDays(weekStart(),dayIdx);return `${DAYS[dayIdx]} ${fmt(d)} • الحصة ${p} • ${LANES[g].name}`}
 function setStatus(t,err){$("st").textContent=t;$("st").className="status"+(err?" err":"")}
-const clsOf=x=>`الصف ${x.grade}${x.sec?" / "+x.sec:""}`;
+const clsOf=x=>`${/^روضة/.test(x.grade)?"":"الصف "}${x.grade}${x.sec?" / "+x.sec:""}`;
 
 async function load(quiet){
   const seq=++loadSeq;if(!quiet)setStatus("جاري تحميل الحجوزات…");
@@ -251,19 +275,22 @@ $("days").onclick=e=>{const b=e.target.closest(".day");if(!b)return;dayIdx=+b.da
 $("prev").onclick=()=>{if(off>0){off--;pickDefaultDay();bookings={};render();load()}};
 $("next").onclick=()=>{if(off<maxAhead()){off++;dayIdx=0;bookings={};render();load()}};
 
+function fillSecs(sel){$("sec").innerHTML=secsOf($("grade").value).map(y=>`<option${y===sel?" selected":""}>${y}</option>`).join("")}
+$("grade").onchange=()=>fillSecs();
 function openBook(g,p,left,x){
   $("grade").innerHTML=LANES[g].grades.map(y=>`<option${x&&y===x.grade?" selected":""}>${y}</option>`).join("");
-  $("tName").value=x?x.teacher:(myName||"");$("tName").readOnly=!isAdmin();$("sec").value=x?x.sec||"":"";
+  fillSecs(x&&x.sec);
+  $("tName").value=x?x.teacher:(myName||"");$("tName").readOnly=!isAdmin();
   $("cnt").max=left;$("cnt").value=x?cntOf(x,g):left;$("bMsg").textContent="";
   $("fixRow").hidden=!isAdmin()||!!x;$("fix").checked=false;
-  open("dlgBook");if(!x)setTimeout(()=>($("tName").value?$("sec"):$("tName")).focus(),50);
+  open("dlgBook");
 }
 $("sheet").onclick=e=>{
   const b=e.target.closest("button.slot");if(!b||b.disabled)return;
   const g=b.dataset.g,p=+b.dataset.p,date=key(addDays(weekStart(),dayIdx));
   if(b.dataset.new&&!role){openLogin();return}
   if(b.dataset.new){
-    const left=LANES[g].n-used(slotList(date,g,p),g);
+    const left=LANES[g].n-poolUsed(date,g,p);
     pending={g,p,date};
     $("bT").textContent="حجز التابلت";$("bS").textContent=`${slotLabel(g,p)} • متاح ${left} من ${LANES[g].n}`;
     openBook(g,p,left);return;
@@ -279,7 +306,7 @@ $("sheet").onclick=e=>{
 };
 $("vEdit").onclick=()=>{
   const q=pending;if(!q||!isAdmin())return;const {x,g,p,date}=q;
-  const left=LANES[g].n-used(slotList(date,g,p),g)+cntOf(x,g);
+  const left=LANES[g].n-poolUsed(date,g,p)+cntOf(x,g);
   document.querySelectorAll(".dlg.on").forEach(d=>d.classList.remove("on"));
   pending={...q,edit:true};
   $("bT").textContent="تعديل الحجز";$("bS").textContent=`${slotLabel(g,p)} • متاح لهالحجز ${left}`;
