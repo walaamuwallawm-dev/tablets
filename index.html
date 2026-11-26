@@ -3,8 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>حجز التابلت – مدارس الدر المنثور</title>
-<link rel="icon" id="fav">
+<title>حجز التابلت</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Lalezar&family=IBM+Plex+Sans+Arabic:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
@@ -14,19 +13,15 @@
    COLOUR and TYPE: chalkboard green, paper white, coral pin; Lalezar titles + IBM Plex Sans Arabic.
    LAYOUT: board header with week + day tabs, the sheet below, modal for booking. */
 :root{color-scheme:light dark;
-/* ألوان شعار مدارس الدر المنثور: عنابي، ذهبي، أزرق */
---bg:light-dark(#f7f2ea,#170d0d);--board:light-dark(#8a1518,#4d0d0f);--paper:light-dark(#fff,#211414);
---ink:light-dark(#2a1512,#f3e9e4);--mute:light-dark(#7a645b,#c2aea4);--line:light-dark(#ecdfd0,#3d2725);
---coral:#e9ad2c;--a:light-dark(#1f4fa0,#7fa8ec);--b:light-dark(#8a1518,#f08a8c);--free:light-dark(#fbf7f0,#2a1a19)}
+--bg:light-dark(#eef3ee,#0f1d17);--board:light-dark(#1f4d3a,#163a2c);--paper:light-dark(#fff,#18281f);
+--ink:light-dark(#15241c,#e8f0ea);--mute:light-dark(#5d7066,#9db3a6);--line:light-dark(#dbe5dd,#2a3f33);
+--coral:#ff6b4a;--a:light-dark(#2f7d5b,#5cc596);--b:light-dark(#3a64b0,#7aa2ea);--free:light-dark(#f5f9f5,#1d3127)}
 :root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
 *{box-sizing:border-box;min-width:0}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 "IBM Plex Sans Arabic",system-ui,sans-serif;overflow-x:clip}
 button,input,select{font:inherit}
 header{background:var(--board);color:#fff;padding:22px max(4vw,14px) 0}
 .top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;max-width:1000px;margin:auto}
-header{background:linear-gradient(160deg,light-dark(#9c1b1e,#5a1012),var(--board) 70%);border-bottom:4px solid var(--coral)}
-.logo{height:64px;width:auto;background:#fff;border-radius:16px;padding:5px 8px;box-shadow:0 3px 0 #0000002e,0 0 0 3px var(--coral)}
-.school{max-width:1000px;margin:12px auto 0;text-align:center;font:400 clamp(22px,5vw,30px)/1.1 Lalezar,sans-serif;color:var(--coral);letter-spacing:.3px;text-shadow:0 2px 0 #0000003a}
 h1{font:400 clamp(30px,6vw,44px)/1.05 Lalezar,sans-serif;margin:0;flex:1}
 .gear{background:#ffffff1f;color:#fff;border:0;border-radius:12px;height:44px;padding:0 14px;cursor:pointer}
 .week{display:flex;align-items:center;gap:8px;max-width:1000px;margin:14px auto 0}
@@ -96,7 +91,7 @@ input:focus,select:focus{outline:2px solid var(--coral);border-color:transparent
 .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .acts{display:flex;gap:10px;margin-top:18px}
 .acts button{flex:1;height:46px;border-radius:12px;border:0;cursor:pointer;font-weight:700}
-.go{background:light-dark(#8a1518,#b3282b);color:#fff}.no{background:var(--free);color:var(--ink)}
+.go{background:var(--coral);color:#fff}.no{background:var(--free);color:var(--ink)}
 .del{background:#c0392b;color:#fff}.ed{background:var(--board);color:#fff}
 .req{display:block;margin:18px auto 0;background:none;border:0;color:var(--mute);text-decoration:underline;cursor:pointer;min-height:44px}
 .mrow{display:flex;align-items:center;gap:8px;padding:10px 0;border-top:1px solid var(--line)}.mrow span{flex:1}
@@ -108,12 +103,23 @@ input:focus,select:focus{outline:2px solid var(--coral);border-color:transparent
 .msg{min-height:20px;font-size:14px;color:var(--coral);margin-top:8px}
 @media(max-width:600px){.row{grid-template-columns:32px repeat(3,minmax(96px,1fr))}.slot.bk i.t{font-size:10px}.slot.bk b{font-size:15px}.slot.bk em{font-size:17px;padding:3px 6px;min-width:28px}.slot.bk span{font-size:12px}.tm{font-size:11px}.pn{font-size:22px}.cell{padding:6px}.slot{padding:6px 8px}}
 @media(prefers-reduced-motion:no-preference){.box{animation:up .18s ease-out}@keyframes up{from{transform:translateY(12px);opacity:0}}}
+/* الشريط العلوي ذهبي والكتابة عنابي */
+header{background:linear-gradient(160deg,#f6cf63,#e9ad2c 70%)!important;color:#7a1215!important;border-bottom:4px solid #8a1518!important}
+header h1{color:#7a1215;text-shadow:0 2px 0 #ffffff66}
+.school{color:#8a1518!important;text-shadow:0 1px 0 #ffffff80!important}
+.week b{color:#5e0e10}
+.note{color:#6e2a12!important}.note.hot{color:#7a1215!important}.note.hot::before{background:#8a1518!important}
+.gear,.nav{background:#8a1518!important;color:#fff!important;box-shadow:0 3px 0 #5e0e10}
+.nav:disabled{opacity:.35}
+.logo{box-shadow:0 3px 0 #0000002e,0 0 0 3px #8a1518!important}
+.day{background:#8a15181c!important;color:#6a1012!important}
+.day.on{background:var(--bg)!important;color:var(--ink)!important}
+.day.today small::after{color:#8a1518!important;font-weight:700}
 </style>
 </head>
 <body>
 <header>
-  <div class="top"><img class="logo" alt="شعار مدارس الدر المنثور" src="data:image/png;base64,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"><h1>حجز التابلت</h1><button class="gear" id="out">دخول</button><button class="gear" id="gear" hidden>أوقات الحصص</button></div>
-  <div class="school">مدارس الدر المنثور</div>
+  <div class="top"><h1>حجز التابلت</h1><button class="gear" id="out">دخول</button><button class="gear" id="gear" hidden>أوقات الحصص</button></div>
   <div class="week"><button class="nav" id="prev" aria-label="الأسبوع السابق">›</button><b id="wk"></b><button class="nav" id="next" aria-label="الأسبوع التالي">‹</button></div>
   <div class="note" id="note"></div>
   <div class="days" id="days"></div>
@@ -427,7 +433,6 @@ setInterval(()=>{
   else{renderHead();load(true)}
 },30000);
 
-try{$("fav").href=document.querySelector(".logo").src}catch(_){}
 pickDefaultDay();render();
 load();
 }
