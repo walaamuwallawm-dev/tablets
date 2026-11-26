@@ -42,11 +42,12 @@ h1{font:400 clamp(30px,6vw,44px)/1.05 Lalezar,sans-serif;margin:0;flex:1}
 main{max-width:1000px;margin:auto;padding:18px max(4vw,14px) 40px}
 .sheet{background:var(--paper);border-radius:18px;box-shadow:0 1px 0 var(--line),0 10px 30px #0001;overflow:hidden}
 .sheet{overflow-x:auto}
-.row{display:grid;grid-template-columns:48px repeat(4,minmax(96px,1fr));border-top:1px solid var(--line)}
+.row{display:grid;grid-template-columns:48px repeat(3,minmax(100px,1fr));border-top:1px solid var(--line)}
 .row.head{border:0;font-size:14px;font-weight:700}
 .row.head div{padding:12px 10px}
 .row.head small{display:block;font-weight:500;font-size:13px;color:var(--mute)}
-.row.head .lk1,.row.head .lk2{color:light-dark(#0f8f84,#4fd1c5)}.row.head .la{color:var(--a)}.row.head .lb{color:var(--b)}
+.slot.bk i.t{display:block;font-style:normal;font-size:11px;opacity:.9;direction:ltr;text-align:right}
+.row.head .lk{color:light-dark(#0f8f84,#4fd1c5)}.row.head .la{color:var(--a)}.row.head .lb{color:var(--b)}
 .pn{display:grid;place-items:center;font:400 26px Lalezar,sans-serif;color:var(--mute);background:var(--free)}
 .cell{padding:8px;border-inline-start:1px solid var(--line)}
 .tm{font-size:13px;color:var(--mute);white-space:nowrap;direction:ltr;text-align:right}
@@ -88,7 +89,7 @@ input:focus,select:focus{outline:2px solid var(--coral);border-color:transparent
 .tgrid input{height:40px;font-size:15px;direction:ltr;text-align:center}
 .tgrid .h{font-size:13px;font-weight:700}
 .msg{min-height:20px;font-size:14px;color:var(--coral);margin-top:8px}
-@media(max-width:600px){.row{grid-template-columns:32px repeat(4,minmax(84px,1fr))}.slot.bk b{font-size:13px}.slot.bk span{font-size:12px}.tm{font-size:11px}.pn{font-size:22px}.cell{padding:6px}.slot{padding:6px 8px}}
+@media(max-width:600px){.row{grid-template-columns:32px repeat(3,minmax(96px,1fr))}.slot.bk i.t{font-size:10px}.slot.bk b{font-size:13px}.slot.bk span{font-size:12px}.tm{font-size:11px}.pn{font-size:22px}.cell{padding:6px}.slot{padding:6px 8px}}
 @media(prefers-reduced-motion:no-preference){.box{animation:up .18s ease-out}@keyframes up{from{transform:translateY(12px);opacity:0}}}
 </style>
 </head>
@@ -147,8 +148,8 @@ const API_URL="https://script.google.com/macros/s/AKfycbwPEcfCTu6pDPnIRRPeMAdnjL
 
 const DAYS=["الأحد","الإثنين","الثلاثاء","الأربعاء","الخميس"];
 // الروضة والأول–الثالث بيشتركوا بنفس الـ١٥ تابلت (pool)
-const LANES={k1:{name:"روضة أولى",n:15,pool:"a",max:6,grades:["روضة أولى"]},k2:{name:"روضة ثانية",n:15,pool:"a",max:6,grades:["روضة ثانية"]},a:{name:"الأول – الثالث",n:15,pool:"a",max:8,grades:["الأول","الثاني","الثالث"]},b:{name:"الرابع – الخامس",n:20,pool:"b",max:8,grades:["الرابع","الخامس"]}};
-const ORDER=["k1","k2","a","b"];
+const LANES={k:{name:"الروضة",n:15,pool:"a",max:6,grades:["روضة أولى","روضة ثانية"]},a:{name:"الأول – الثالث",n:15,pool:"a",max:8,grades:["الأول","الثاني","الثالث"]},b:{name:"الرابع – الخامس",n:20,pool:"b",max:8,grades:["الرابع","الخامس"]}};
+const ORDER=["k","a","b"];
 const poolLanes=g=>ORDER.filter(x=>LANES[x].pool===LANES[g].pool);
 const AB=["أ","ب","ج","د","هـ","و"];
 const SECS={"روضة أولى":["العنبر","البنفسج","المنثور","الريحان"],"روضة ثانية":["القرنفل","السوسن","النرجس","الزنبق","الورد"]};
@@ -156,8 +157,8 @@ const secsOf=gr=>SECS[gr]||AB;
 // أوقات الحصص الافتراضية (المشرفات بيقدروا يغيروها من زر «أوقات الحصص»)
 const DEF_TIMES={
   a:["8:00 - 8:40","8:40 - 9:20","9:35 - 10:15","11:05 - 11:45","11:45 - 12:25","12:25 - 1:00","1:20 - 1:55","1:55 - 2:30"],
-  k1:["9:10 - 9:40","9:40 - 10:10","10:45 - 11:15","11:15 - 11:45","11:45 - 12:15","12:15 - 12:45"],
-  k2:["9:20 - 9:50","9:50 - 10:20","10:50 - 11:20","11:20 - 11:50","11:50 - 12:20","12:20 - 12:50"],
+  "روضة أولى":["9:10 - 9:40","9:40 - 10:10","10:45 - 11:15","11:15 - 11:45","11:45 - 12:15","12:15 - 12:45"],
+  "روضة ثانية":["9:20 - 9:50","9:50 - 10:20","10:50 - 11:20","11:20 - 11:50","11:50 - 12:20","12:20 - 12:50"],
   b:["8:00 - 8:40","9:10 - 9:50","10:00 - 10:40","10:40 - 11:20","11:40 - 12:20","12:20 - 1:00","1:10 - 1:50","1:50 - 2:30"]};
 // أوقات خاصة لأيام معيّنة (٢ = الثلاثاء، ٤ = الخميس) — بتنعبى لما توصل
 const DEF_DAY={};
@@ -189,17 +190,23 @@ function slotList(date,g,p){return [...(fixed[`${dayIdx}_${g}_${p}`]||[]),...(bo
 // تحويل "1:20 - 1:55" لدقائق (الساعات من ١ لـ ٦ بعد الظهر)
 function span(t){const m=String(t||"").match(/(\d+):(\d+)\s*-\s*(\d+):(\d+)/);if(!m)return null;const f=(h,mi)=>{h=+h;if(h<7)h+=12;return h*60+ +mi};return [f(m[1],m[2]),f(m[3],m[4])]}
 // التابلت المستعملة بنفس الوقت من كل الخانات المشتركة (الروضة + الأول–الثالث)
-function poolUsed(date,g,p){
-  const me=span(timesFor(dayIdx,g)[p-1]);let sum=0;
+// وقت الحصة: الروضة حسب الصف (أولى/ثانية)، والباقي حسب الخانة
+const tOf=(g,p,grade)=>g==="k"?(DEF_TIMES[grade]||[])[p-1]:timesFor(dayIdx,g)[p-1];
+// كم تابلت مستعملة بنفس وقت هالحصة (grade للروضة)
+function poolUsed(date,g,p,grade){
+  const me=span(tOf(g,p,grade));let sum=0;
   poolLanes(g).forEach(x=>{for(let q=1;q<=LANES[x].max;q++){
-    const o=span(timesFor(dayIdx,x)[q-1]);
-    const hit=(x===g&&q===p)||(me&&o&&me[0]<o[1]&&o[0]<me[1]);
-    if(hit)sum+=used(slotList(date,x,q),x);
+    slotList(date,x,q).forEach(b=>{
+      const o=span(tOf(x,q,b.grade));
+      const hit=(x===g&&q===p&&(g!=="k"||b.grade===grade))||(me&&o&&me[0]<o[1]&&o[0]<me[1]);
+      if(hit)sum+=cntOf(b,x);
+    });
   }});
   return sum;
 }
+// للخانة: أكثر عدد متاح (بالروضة بين أولى وثانية)
+const cellLeft=(date,g,p)=>g==="k"?Math.max(...LANES.k.grades.map(gr=>LANES.k.n-poolUsed(date,g,p,gr))):LANES[g].n-poolUsed(date,g,p);
 function timesFor(d,g){
-  if(g==="k1"||g==="k2")return DEF_TIMES[g];
   const pick=o=>o&&o[g]&&o[g].some(Boolean)?o[g]:null;
   return pick(times[String(d)])||pick(DEF_DAY[d])||pick(times.all)||DEF_TIMES[g];
 }
@@ -228,13 +235,13 @@ function renderHead(){
 }
 function renderSheet(){
   const date=key(addDays(weekStart(),dayIdx)),past=date<key(new Date());
-  let h=`<div class="row head"><div></div><div class="lk1">${LANES.k1.name}<small>من نفس الـ15</small></div><div class="lk2">${LANES.k2.name}<small>من نفس الـ15</small></div><div class="la">${LANES.a.name}<small>${LANES.a.n} تابلت</small></div><div class="lb">${LANES.b.name}<small>${LANES.b.n} تابلت</small></div></div>`;
+  let h=`<div class="row head"><div></div><div class="lk">${LANES.k.name}<small>من نفس الـ15</small></div><div class="la">${LANES.a.name}<small>${LANES.a.n} تابلت</small></div><div class="lb">${LANES.b.name}<small>${LANES.b.n} تابلت</small></div></div>`;
   for(let p=1;p<=P;p++){
     h+=`<div class="row"><div class="pn">${p}</div>`+ORDER.map(g=>{
       if(p>LANES[g].max)return `<div class="cell ${g}"><div class="slot none">—</div></div>`;
-      const list=slotList(date,g,p),left=LANES[g].n-poolUsed(date,g,p),tm=timesFor(dayIdx,g)[p-1];
+      const list=slotList(date,g,p),left=cellLeft(date,g,p),tm=g==="k"?"":timesFor(dayIdx,g)[p-1];
       let c=`<div class="cell ${g}">`+(tm?`<div class="tm">${esc(tm)}</div>`:"");
-      c+=list.map(x=>`<button class="slot bk ${x.fixed?"fx":(GC[x.grade]||"")}${past?" past":""}" data-g="${g}" data-p="${p}" data-k="${x.fixed?"f":"b"}" data-id="${esc(x.id)}"><em>${cntOf(x,g)}</em><b>${esc(x.teacher)}${x.fixed?'<i class="pin">ثابت</i>':""}</b><span>${esc(x.cls)}</span></button>`).join("");
+      c+=list.map(x=>`<button class="slot bk ${x.fixed?"fx":(GC[x.grade]||"")}${past?" past":""}" data-g="${g}" data-p="${p}" data-k="${x.fixed?"f":"b"}" data-id="${esc(x.id)}"><em>${cntOf(x,g)}</em><b>${esc(x.teacher)}${x.fixed?'<i class="pin">ثابت</i>':""}</b><span>${esc(x.cls)}</span>${g==="k"?`<i class="t">${esc(tOf("k",p,x.grade)||"")}</i>`:""}</button>`).join("");
       if(past)c+=list.length?"":`<button class="slot past" disabled>—</button>`;
       else if(left>0)c+=`<button class="slot" data-g="${g}" data-p="${p}" data-new="1">+ متاح ${left===LANES[g].n?"":`(باقي ${left})`}</button>`;
       else c+=`<div class="slot full">محجوزة بالكامل</div>`;
@@ -262,8 +269,9 @@ async function load(quiet){
     if(!r.ok){setStatus("صار خطأ بتحميل الحجوزات.",1);return}
     if(token&&!r.role){token="";store.set("tb_token","")}
     const m={},f={};
-    r.bookings.forEach(x=>{x.cls=clsOf(x);const k=`${x.date}_${x.lane}_${x.period}`;(m[k]=m[k]||[]).push(x)});
-    r.fixed.forEach(x=>{x.cls=clsOf(x);x.fixed=true;const k=`${x.day}_${x.lane}_${x.period}`;(f[k]=f[k]||[]).push(x)});
+    const fixLane=x=>{if(x.lane==="k1"||x.lane==="k2")x.lane="k"};
+    r.bookings.forEach(x=>{fixLane(x);x.cls=clsOf(x);const k=`${x.date}_${x.lane}_${x.period}`;(m[k]=m[k]||[]).push(x)});
+    r.fixed.forEach(x=>{fixLane(x);x.cls=clsOf(x);x.fixed=true;const k=`${x.day}_${x.lane}_${x.period}`;(f[k]=f[k]||[]).push(x)});
     Object.values(m).forEach(l=>l.sort((a,b)=>(+a.at||0)-(+b.at||0)));
     bookings=m;fixed=f;times=r.times||{};role=r.role||null;$("out").textContent=role?"خروج":"دخول";if(r.name){myName=r.name;store.set("tb_me",myName)}
     $("gear").hidden=!isAdmin();renderSheet();
@@ -276,12 +284,24 @@ $("prev").onclick=()=>{if(off>0){off--;pickDefaultDay();bookings={};render();loa
 $("next").onclick=()=>{if(off<maxAhead()){off++;dayIdx=0;bookings={};render();load()}};
 
 function fillSecs(sel){$("sec").innerHTML=secsOf($("grade").value).map(y=>`<option${y===sel?" selected":""}>${y}</option>`).join("")}
-$("grade").onchange=()=>fillSecs();
+// العدد المتاح بيتغير حسب الصف (للروضة الوقت بيختلف بين أولى وثانية)
+function updLeft(keep){
+  const q=pending;if(!q)return;const gr=$("grade").value;
+  let left=LANES[q.g].n-poolUsed(q.date,q.g,q.p,gr);
+  if(q.edit&&q.x){const same=q.g!=="k"||q.x.grade===gr;const o=span(tOf(q.g,q.p,q.x.grade)),me=span(tOf(q.g,q.p,gr));if(same||(o&&me&&me[0]<o[1]&&o[0]<me[1]))left+=cntOf(q.x,q.g)}
+  left=Math.max(0,left);
+  const tm=tOf(q.g,q.p,gr);
+  $("bS").textContent=`${slotLabel(q.g,q.p)}${tm?" • "+tm:""} • متاح ${left} من ${LANES[q.g].n}`;
+  $("cnt").max=left;if(!keep||+$("cnt").value>left)$("cnt").value=left;
+  $("bMsg").textContent=left?"":"ما في تابلت متاحة لهالصف بهالوقت.";
+  $("fBook").querySelector(".go").disabled=!left;
+}
+$("grade").onchange=()=>{fillSecs();updLeft()};
 function openBook(g,p,left,x){
   $("grade").innerHTML=LANES[g].grades.map(y=>`<option${x&&y===x.grade?" selected":""}>${y}</option>`).join("");
   fillSecs(x&&x.sec);
   $("tName").value=x?x.teacher:(myName||"");$("tName").readOnly=!isAdmin();
-  $("cnt").max=left;$("cnt").value=x?cntOf(x,g):left;$("bMsg").textContent="";
+  $("bMsg").textContent="";if(x)$("cnt").value=cntOf(x,g);updLeft(!!x);
   $("fixRow").hidden=!isAdmin()||!!x;$("fix").checked=false;
   open("dlgBook");
 }
@@ -290,10 +310,9 @@ $("sheet").onclick=e=>{
   const g=b.dataset.g,p=+b.dataset.p,date=key(addDays(weekStart(),dayIdx));
   if(b.dataset.new&&!role){openLogin();return}
   if(b.dataset.new){
-    const left=LANES[g].n-poolUsed(date,g,p);
     pending={g,p,date};
-    $("bT").textContent="حجز التابلت";$("bS").textContent=`${slotLabel(g,p)} • متاح ${left} من ${LANES[g].n}`;
-    openBook(g,p,left);return;
+    $("bT").textContent="حجز التابلت";
+    openBook(g,p,0);return;
   }
   const isFixed=b.dataset.k==="f",list=isFixed?fixed[`${dayIdx}_${g}_${p}`]:bookings[`${date}_${g}_${p}`],x=(list||[]).find(y=>y.id===b.dataset.id);if(!x)return;
   pending={g,p,date,x,isFixed};
@@ -306,11 +325,10 @@ $("sheet").onclick=e=>{
 };
 $("vEdit").onclick=()=>{
   const q=pending;if(!q||!isAdmin())return;const {x,g,p,date}=q;
-  const left=LANES[g].n-poolUsed(date,g,p)+cntOf(x,g);
   document.querySelectorAll(".dlg.on").forEach(d=>d.classList.remove("on"));
   pending={...q,edit:true};
-  $("bT").textContent="تعديل الحجز";$("bS").textContent=`${slotLabel(g,p)} • متاح لهالحجز ${left}`;
-  openBook(g,p,left,x);
+  $("bT").textContent="تعديل الحجز";
+  openBook(g,p,0,x);
 };
 
 const ERR={full:r=>r.left>0?`الباقي ${r.left} تابلت بس.`:"للأسف الحصة انحجزت بالكامل هلأ.",busy:()=>"في حدا عم يحجز هلأ، جربي بعد ثواني.",perm:()=>"هاد بس للمشرفات.",past:()=>"ما بنقدر نحجز بيوم خلص.",gone:()=>"هالحجز انمسح من قبل.",auth:()=>"انتهت صلاحية الدخول، ادخلي من جديد."};
